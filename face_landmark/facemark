@@ -1,0 +1,47 @@
+import dlib
+import cv2 as cv
+import time
+
+def open_cam():
+    cam = cv.VideoCapture(0)
+    while True:
+        _, img = cam.read()
+        cv.imshow('my webcam', img)
+
+        if cv.waitKey(1) == 27:
+            cam.release()
+            return img
+
+    # cv2.iwwrite("img.png",img)
+def detection(src):
+    start = time.time()
+    detector = dlib.get_frontal_face_detector() #Load face detector
+    predictor = dlib.shape_predictor('shape_predictor_68_face_landmarks.dat')
+
+
+    win = dlib.image_window()
+    win.clear_overlay()
+    win.set_image(src)
+
+    dets = detector(src, 1)
+    win.add_overlay(dets)
+
+    for k, d in enumerate(dets):
+        shape = predictor(src, d)
+        win.add_overlay(shape)
+
+    end = time.time()
+    print("Hog + SVM Execution time: " + str(end-start))
+    # while True:
+    #     for k, d in enumerate(dets):
+    #         shape = predictor(src, d)
+    #         win.add_overlay(shape)
+    #     if cv.waitKey(1) == 27:
+    #         break  # esc to quit
+
+image = open_cam()
+detection(image)
+
+
+
+cv.destroyAllWindows()
